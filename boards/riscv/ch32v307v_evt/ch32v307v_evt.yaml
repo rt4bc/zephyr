@@ -1,0 +1,20 @@
+# Copyright (c) 2021, TODO
+# SPDX-License-Identifier: Apache-2.0
+
+identifier: ch32v307v_evt
+name: WCH CH32V307V-EVT
+type: mcu
+arch: riscv32
+ram: 128
+flash: 192
+toolchain:
+  - zephyr
+supported:
+  - dma
+  - flash
+  - gpio
+  - pwm
+  - spi
+  - uart
+  - watchdog
+vendor: wch
