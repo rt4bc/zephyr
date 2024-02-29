@@ -1,0 +1,17 @@
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+choice
+	prompt "CH32 MCU Selection"
+	depends on SOC_SERIES_CH32V3X
+
+config SOC_CH32V303
+	bool "ch32v303"
+
+config SOC_CH32V305
+	bool "ch32v305"
+
+config SOC_CH32V307
+	bool "ch32v307"
+
+endchoice

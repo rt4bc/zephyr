@@ -1,0 +1,4 @@
+# Copyright (c) 
+# SPDX-License-Identifier: Apache-2.0
+
+source "soc/riscv/wch_ch32/*/Kconfig.defconfig.series"

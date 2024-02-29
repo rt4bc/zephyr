@@ -1,0 +1,16 @@
+
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+if SOC_SERIES_CH32V3X
+
+config SOC_SERIES
+	default "ch32v3x"
+
+config NUM_IRQS
+	# must be >= the highest interrupt number used
+	default 88
+
+source "soc/riscv/wch_ch32/ch32v3x/Kconfig.defconfig.ch32v3*"
+
+endif # SOC_SERIES_CH32V3X

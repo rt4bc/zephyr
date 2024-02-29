@@ -1,0 +1,21 @@
+# CH32V3X SOC implementation
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+config SOC_SERIES_CH32V3X
+	bool "CH32V3X"
+    select RISCV
+    select RISCV_GP
+    select RISCV_ISA_RV32I
+	select RISCV_ISA_EXT_M
+	select RISCV_ISA_EXT_A
+	select RISCV_ISA_EXT_C
+    select RISCV_ISA_EXT_F
+	select RISCV_ISA_EXT_ZICSR
+	select RISCV_ISA_EXT_ZIFENCEI
+    select RISCV_PRIVILEGED
+    select RISCV_VECTORED_MODE
+    select SOC_FAMILY_CH32
+    #select RISCV_HAS_PLIC
+	#select RISCV_PMP
+    

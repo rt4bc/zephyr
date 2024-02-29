@@ -1,0 +1,9 @@
+# Copyright (c) 
+# SPDX-License-Identifier: Apache-2.0
+
+if SOC_CH32V303
+
+config SOC
+	default "ch32v303"
+
+endif # SOC_CH32V303

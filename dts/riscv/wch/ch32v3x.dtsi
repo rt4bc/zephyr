@@ -1,0 +1,57 @@
+/*
+ * Copyright (c)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+ #include <freq.h>
+ #include <mem.h>
+ #include <zephyr/dt-bindings/adc/adc.h>
+ #include <zephyr/dt-bindings/gpio/gpio.h>
+ #include <zephyr/dt-bindings/i2c/i2c.h>
+ #include <zephyr/dt-bindings/pwm/pwm.h>
+ 
+
+ / {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu: cpu@0 {
+			clock-frequency = <DT_FREQ_M(144)>;
+			compatible = "wch,qingke", "riscv";
+			riscv,isa = "rv32imacf_zicsr_zifencei";
+			reg = <0>;
+		};
+	};
+
+    soc {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "simple-bus";
+
+		sram0: memory@20000000 {
+			compatible = "mmio-sram";
+		};
+
+
+		fmc: flash-controller@40022000 {
+			compatible = "wch,ch32-flash-controller";
+			reg = <0x40022000 0x400>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			flash0: flash@8000000 {
+				compatible = "wch,ch32-nv-flash", "soc-nv-flash";
+				write-block-size = <256>;
+				page-size = <256>;
+                max-erase-time-ms = <300>;
+			};
+		};
+
+    };
+
+};
