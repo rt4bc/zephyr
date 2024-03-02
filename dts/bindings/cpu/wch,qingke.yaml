@@ -1,0 +1,8 @@
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+description: WCH QingKe RISC-V Core
+
+compatible: "wch,qingke"
+
+include: riscv,cpus.yaml

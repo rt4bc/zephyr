@@ -1,0 +1,13 @@
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  CH32 Flash memory controller
+  Fast programming: The page operation mode (Recommended) is used for 
+  this method. After unlocking in a specific sequence, 
+  a single 256-byte programming and 256-byte erasing are performed, 
+  32K-byte erasing,64K-byte erasing and whole chip erasure are performed
+
+compatible: "wch,ch32-flash-controller"
+
+include: flash-controller.yaml

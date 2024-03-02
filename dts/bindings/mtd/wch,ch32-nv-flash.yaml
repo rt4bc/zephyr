@@ -1,0 +1,25 @@
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  Flash memory & controller binding of CH32
+
+include: soc-nv-flash.yaml
+
+compatible: wch,ch32-nv-flash
+
+properties:
+  max-erase-time-ms:
+    type: int
+    required: true
+    description: Max erase time(millisecond) of a flash page
+
+  page-size:
+    type: int
+    required: true
+    description: Flash memory page size
+
+  write-block-size:
+    type: int
+    required: true
+    description: Flash memory a single programming size
