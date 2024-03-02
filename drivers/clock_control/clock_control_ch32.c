@@ -12,7 +12,8 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/clock_control.h>
-//#include <zephyr/dt-bindings/clock/rpi_pico_clock.h>
+
+#include <zephyr/dt-bindings/clock/ch32_clock.h>
 
 static int clock_control_ch32_init(const struct device *dev)
 {
