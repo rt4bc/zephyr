@@ -1,0 +1,9 @@
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+config CLOCK_CONTROL_CH32
+	bool "CH32 clock control"
+	default y
+	depends on DT_HAS_WCH_CH32_RCC_ENABLED
+	help
+	  Enable driver for WCH CH32 Reset Clock Controller(RCC).

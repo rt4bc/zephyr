@@ -17,6 +17,14 @@ config SYS_CLOCK_HW_CYCLES_PER_SEC
 	# The CPU frequency is set to the maximum value of 144MHz by default.
 	default 18000000
 
+#config PINCTRL
+#	default y
+
+#config RESET
+#	default y
+
+config CLOCK_CONTROL
+	default y
 
 source "soc/riscv/wch_ch32/ch32v3x/Kconfig.defconfig.ch32v3*"
 

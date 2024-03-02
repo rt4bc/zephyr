@@ -1,0 +1,60 @@
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  CH32 MCU Reset and Clock Controller (RCC) if a multi-function peripheral in
+  charge of reset control (RCTL) and clock control (CCTL) for all SoC
+  peripherals. Child nodes are used to represent each functional block.
+
+compatible: "wch,ch32-rcc"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true
+
+  clock-frequency:
+    required: true
+    type: int
+    description: |
+      default frequency in Hz for clock output
+
+  ahb-prescaler:
+    type: int
+    required: true
+    enum:
+      - 1
+      - 2
+      - 4
+      - 8
+      - 16
+      - 64
+      - 128
+      - 256
+      - 512
+    description: |
+        AHB prescaler. Defines actual core clock frequency (HCLK)
+        based on system frequency input.
+        The HCLK clocks CPU, AHB, memories and DMA.
+
+  apb1-prescaler:
+    type: int
+    required: true
+    enum:
+      - 1
+      - 2
+      - 4
+      - 8
+      - 16
+
+  apb2-prescaler:
+    type: int
+    required: true
+    enum:
+      - 1
+      - 2
+      - 4
+      - 8
+      - 16
+
