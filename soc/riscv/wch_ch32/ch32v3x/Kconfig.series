@@ -18,4 +18,5 @@ config SOC_SERIES_CH32V3X
     select SOC_FAMILY_CH32
     #select RISCV_HAS_PLIC
 	#select RISCV_PMP
+    select INCLUDE_RESET_VECTOR
     

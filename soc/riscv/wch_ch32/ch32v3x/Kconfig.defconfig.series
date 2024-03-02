@@ -11,6 +11,13 @@ config NUM_IRQS
 	# must be >= the highest interrupt number used
 	default 88
 
+config SYS_CLOCK_HW_CYCLES_PER_SEC
+	# a 64-bit up/downcounter (SysTick) that supports HCLK or HCLK/8 as the time base,
+	# has a higher priority and can be used for time base after calibration
+	# The CPU frequency is set to the maximum value of 144MHz by default.
+	default 18000000
+
+
 source "soc/riscv/wch_ch32/ch32v3x/Kconfig.defconfig.ch32v3*"
 
 endif # SOC_SERIES_CH32V3X
