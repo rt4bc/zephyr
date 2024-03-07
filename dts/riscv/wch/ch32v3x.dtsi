@@ -55,7 +55,34 @@
 			#clock-cells = <0>;
 			compatible = "fixed-clock";
 			clock-frequency = <DT_FREQ_M(8)>;
+			status = "okay";
+		};
+
+		pll1: pll1 {
+			compatible = "fixed-factor-clock";
 			status = "disabled";
+			clocks = <&clk_hse>;
+			clock-div = <1>;
+			clock-mult = <18>;
+			#clock-cells = <0>;
+		};
+
+		pll2: pll2 {
+			compatible = "fixed-factor-clock";
+			status = "disabled";
+			clocks = <&clk_hse>;
+			clock-div = <2>;
+			clock-mult = <4>;
+			#clock-cells = <0>;
+		};
+
+		pll3: pll3 {
+			compatible = "fixed-factor-clock";
+			status = "disabled";
+			clocks = <&clk_hse>;
+			clock-div = <1>;
+			clock-mult = <15>;
+			#clock-cells = <0>;
 		};
 	};
 
@@ -89,12 +116,12 @@
 			status = "okay";
 			
 			clocks = <&clk_hsi>;  /* Select 144MHz pll as SYSCLK source */
-			ahb-prescaler = <2>;
-			clock-frequency = <DT_FREQ_M(72)>; 
+			ahb-prescaler = <1>;
+			clock-frequency = <DT_FREQ_M(144)>; 
 			/* = SYSCLK / AHB prescaler */
 			/* default frequency in Hz for clock output */
-			apb1-prescaler = <1>;
-			apb2-prescaler = <1>;
+			apb1-prescaler = <2>;
+			apb2-prescaler = <2>;
 
 			rctl: reset-controller {
 				compatible = "wch,ch32-rctl";

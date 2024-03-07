@@ -18,3 +18,16 @@
 	};
 
 };
+
+&clk_hse {
+	status = "okay";
+};
+
+&pll1 {
+	status = "okay";
+};
+
+
+&rcc {
+	clocks = <&pll1>;
+};

@@ -8,10 +8,13 @@ description: |
 
 compatible: "wch,ch32-rcc"
 
-include: base.yaml
+include: [clock-controller.yaml, base.yaml]
 
 properties:
   reg:
+    required: true
+  
+  clocks:
     required: true
 
   clock-frequency:

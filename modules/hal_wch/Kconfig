@@ -1,0 +1,13 @@
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+config ZEPHYR_HAL_WCH_MODULE
+	bool
+
+config HAS_CH32_HAL
+	bool
+	select HAS_CMSIS_CORE if ARM
+
+if HAS_CH32_HAL
+
+endif # HAS_CH32_HAL
