@@ -14,24 +14,7 @@
 #include <zephyr/drivers/clock_control.h>
 
 #include <zephyr/dt-bindings/clock/ch32_clock.h>
-
-#define CPU_FREQ DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency)
-#define HSE_FREQ DT_PROP(DT_PATH(clocks, clk_hse), clock_frequency)
-#define HSI_FREQ DT_PROP(DT_PATH(clocks, clk_hsi), clock_frequency)
-#define LSI_FREQ DT_PROP(DT_PATH(clocks, clk_lsi), clock_frequency)
-#define LSE_FREQ DT_PROP(DT_PATH(clocks, clk_lse), clock_frequency)
-#define PLL1_MULT          DT_PROP(DT_PATH(clocks, pll1), clock_mult)
-
-#define RCC_AHB_PRESCALER  DT_PROP(DT_PATH(soc, reset_clock_controller_40021000), ahb_prescaler)
-#define RCC_APB1_PRESCALER DT_PROP(DT_NODELABEL(rcc), apb1_prescaler)
-#define RCC_APB2_PRESCALER DT_PROP(DT_NODELABEL(rcc), apb2_prescaler)
-
-#define RCC_CLOCKS_OUTPUT  DT_PROP(DT_PATH(soc, rcc), clock_frequency)
-#define RCC_CLOCKS_SRC     DT_PHANDLE(DT_NODELABEL(rcc), clocks)
-#define CLK_HSE_NODE       DT_NODELABEL(clk_hse)
-#define CLK_HSI_NODE       DT_NODELABEL(clk_hsi)
-#define PLL1_NODE          DT_NODELABEL(pll1)
-
+#include <zephyr/drivers/clock_control/ch32_clock_control.h>
 
 #ifdef CONFIG_RISCV
 #include "ch32v30x_rcc.h"
@@ -82,28 +65,77 @@ static int clock_control_ch32_init(const struct device *dev)
 
 static int clock_control_ch32_on(const struct device *dev, clock_control_subsys_t sys)
 {
+	struct ch32_pclken *pclken = (struct ch32_pclken *)(sys);
 	ARG_UNUSED(dev);
+
+	if (IN_RANGE(pclken->bus, CH32_PERIPH_BUS_MIN, CH32_PERIPH_BUS_MAX) == 0) {
+		/* Attemp to change a wrong periph clock bit */
+		return -ENOTSUP;
+	}
+	sys_set_bit(pclken->bus, pclken->enr);
 	
 	return 0;
 }
 
 static int clock_control_ch32_off(const struct device *dev, clock_control_subsys_t sys)
 {
+	struct ch32_pclken *pclken = (struct ch32_pclken *)(sys);
 	ARG_UNUSED(dev);
+
+	if (IN_RANGE(pclken->bus, CH32_PERIPH_BUS_MIN, CH32_PERIPH_BUS_MAX) == 0) {
+		/* Attemp to change a wrong periph clock bit */
+		return -ENOTSUP;
+	}
+	sys_clear_bit(pclken->bus, pclken->enr);
+
 	return 0;
 }
 
 static enum clock_control_status clock_control_ch32_get_status(const struct device *dev,
 							       clock_control_subsys_t sys)
 {
+	struct ch32_pclken *pclken = (struct ch32_pclken *)(sys);
 	ARG_UNUSED(dev);
+
+	if (sys_test_bit(pclken->bus, pclken->enr) != 0) {
+		return CLOCK_CONTROL_STATUS_ON;
+	}
 	return CLOCK_CONTROL_STATUS_OFF;
 }
 
-static int clock_control_ch32_get_rate(const struct device *dev, clock_control_subsys_t sub_system,
+static int clock_control_ch32_get_rate(const struct device *dev, clock_control_subsys_t sys,
 				       uint32_t *rate)
 {
-	ARG_UNUSED(sub_system);
+	struct ch32_pclken *pclken = (struct ch32_pclken *)(sys);
+	ARG_UNUSED(dev);
+
+	/*
+	 * Get AHB Clock (= SystemCoreClock = SYSCLK/prescaler)
+	 * SystemCoreClock is preferred to CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC
+	 * since it will be updated after clock configuration and hence
+	 * more likely to contain actual clock speed
+	 */
+	uint32_t ahb_clock = CPU_FREQ / RCC_AHB_PRESCALER;
+	uint32_t apb1_clock = ahb_clock / RCC_APB1_PRESCALER;
+	uint32_t apb2_clock = ahb_clock / RCC_APB2_PRESCALER;
+	switch (pclken->bus)
+	{
+	case CH32_CLOCK_BUS_AHB:
+		*rate = ahb_clock;
+		break;
+		
+		case CH32_CLOCK_BUS_APB1:
+		*rate = apb1_clock;
+		break;
+
+		case CH32_CLOCK_BUS_APB2:
+		*rate = apb2_clock;
+		break;
+	
+	default:
+		return -ENOTSUP; 
+	}
+
 	return 0;
 }
 

@@ -9,13 +9,13 @@ config SOC_SERIES
 
 config NUM_IRQS
 	# must be >= the highest interrupt number used
-	default 88
+	default 104
 
 config SYS_CLOCK_HW_CYCLES_PER_SEC
 	# a 64-bit up/downcounter (SysTick) that supports HCLK or HCLK/8 as the time base,
 	# has a higher priority and can be used for time base after calibration
 	# The CPU frequency is set to the maximum value of 144MHz by default.
-	default 18000000
+	default 144000000
 
 #config PINCTRL
 #	default y

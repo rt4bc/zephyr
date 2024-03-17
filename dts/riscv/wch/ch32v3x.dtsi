@@ -90,6 +90,23 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "simple-bus";
+		interrupt-parent = <&pfic>;
+		ranges;
+
+		pfic: interrupt-controller@d2000000 {
+			compatible = "wch,pfic";
+			#address-cells = <0>;
+			#interrupt-cells = <2>;
+			interrupt-controller;
+			reg =  <0xd2000000 0x0001>;
+		};
+
+		systimer: timer@E000F000 {
+			compatible = "wch,systimer";
+			reg = <0xE000F000 0x20>;
+			interrupts = <3 0>;
+			clk-divider = <1>;
+		};
 
 		sram0: memory@20000000 {
 			compatible = "mmio-sram";
@@ -115,13 +132,13 @@
 			#clock-cells = <2>;
 			status = "okay";
 			
-			clocks = <&clk_hsi>;  /* Select 144MHz pll as SYSCLK source */
+			clocks = <&clk_hse>;  /* Select 144MHz pll as SYSCLK source */
 			ahb-prescaler = <1>;
-			clock-frequency = <DT_FREQ_M(144)>; 
+			clock-frequency = <DT_FREQ_M(8)>; 
 			/* = SYSCLK / AHB prescaler */
 			/* default frequency in Hz for clock output */
-			apb1-prescaler = <2>;
-			apb2-prescaler = <2>;
+			apb1-prescaler = <1>;
+			apb2-prescaler = <1>;
 
 			rctl: reset-controller {
 				compatible = "wch,ch32-rctl";
@@ -129,11 +146,35 @@
 				status = "okay";
 			};
 		};
+
+		pinctrl: pin-controller@40010800 {
+			compatible = "wch,ch32-pinctrl";
+			reg = <0x40010800 0x1c00>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+			status = "okay";
+
+			gpioa: gpio@40010800 {
+				compatible = "wch,ch32-gpio";
+				gpio-controller;
+				#gpio-cells = <2>;
+				reg = <0x40010800 0x400>;
+				clocks = <&rcc CH32_CLOCK_BUS_APB2 CH32_CLOCK_GPIOA>;
+			};
+
+			gpiob: gpio@40010C00 {
+				compatible = "wch,ch32-gpio";
+				gpio-controller;
+				#gpio-cells = <2>;
+				reg = <0x40010C00 0x400>;
+				clocks = <&rcc CH32_CLOCK_BUS_APB2 CH32_CLOCK_GPIOB>;
+			};
+		};
 		
 		afio: afio@40010000 {
 			compatible = "wch,ch32-afio";
 			reg = <0x40010000 0x400>;
-			clocks = <&rcc CH32_APB2_EN 0>;
+			clocks = <&rcc 0x18 0>;
 			status = "okay";
 		};
 
