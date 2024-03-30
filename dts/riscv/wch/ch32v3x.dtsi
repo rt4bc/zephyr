@@ -104,8 +104,7 @@
 		systimer: timer@E000F000 {
 			compatible = "wch,systimer";
 			reg = <0xE000F000 0x20>;
-			interrupts = <3 0>;
-			clk-divider = <1>;
+			interrupts = <12 0>;
 		};
 
 		sram0: memory@20000000 {

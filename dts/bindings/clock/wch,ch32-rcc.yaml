@@ -13,7 +13,7 @@ include: [clock-controller.yaml, base.yaml]
 properties:
   reg:
     required: true
-  
+    
   clocks:
     required: true
 
@@ -61,3 +61,9 @@ properties:
       - 8
       - 16
 
+  "#clock-cells":
+    const: 2
+
+clock-cells:
+  - bus
+  - bits

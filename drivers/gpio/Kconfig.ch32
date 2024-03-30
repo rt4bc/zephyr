@@ -1,0 +1,10 @@
+# CH32 GPIO configuration options
+
+# SPDX-License-Identifier: Apache-2.0
+
+config GPIO_CH32
+	bool "WCH CH32 GPIO driver"
+	default y
+	depends on DT_HAS_WCH_CH32_GPIO_ENABLED
+	help
+	  Enable the GPIO driver on WCH CH32 MCU boards

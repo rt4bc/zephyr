@@ -16,11 +16,9 @@ target_compile_definitions(hal_wch PRIVATE CH32V30x_D8C=1)
 endif()
 endif()
 
-
-message(STATUS "print ${gd32_std_src_dir}/${ch32_soc_dir}/src/ch32v30x_rcu.c")
 if(CONFIG_RISCV)
 zephyr_library_sources(${ch32_soc_dir}/riscv/core_riscv.c)
 endif()
 zephyr_library_sources_ifdef(CONFIG_DT_HAS_WCH_CH32_RCC_ENABLED ${gd32_std_src_dir}/${ch32_soc_dir}/src/ch32v30x_rcc.c)
-
+zephyr_library_sources_ifdef(CONFIG_DT_HAS_WCH_CH32_GPIO_ENABLED ${gd32_std_src_dir}/${ch32_soc_dir}/src/ch32v30x_gpio.c)
 endif()

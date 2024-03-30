@@ -10,9 +10,6 @@ config SOC_FAMILY
 	string
 	default "wch_ch32"
 
-config KERNEL_ENTRY
-	default "__ch32_entry"
-
 source "soc/riscv/wch_ch32/*/Kconfig.soc"
 
 endif # SOC_FAMILY_CH32

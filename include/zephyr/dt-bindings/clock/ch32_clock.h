@@ -11,18 +11,17 @@
  * @name Register offsets
  * @{
  */
-#define CH32_AHB_EN             0x14U
-#define CH32_APB1_EN            0x1CU
-#define CH32_APB2_EN            0x18U
+#define CH32_CLOCK_BUS_AHB     0x40021014U
+#define CH32_CLOCK_BUS_APB2    0x40021018U
+#define CH32_CLOCK_BUS_APB1    0x4002101CU
 
-#define CH32_APB2_RST           0x0CU
-#define CH32_APB1_RST           0x10U
+#define CH32_PERIPH_BUS_MIN    CH32_CLOCK_BUS_AHB
+#define CH32_PERIPH_BUS_MAX    CH32_CLOCK_BUS_APB1
 
 /**
  * @name Clock enable/disable definitions for peripherals
  * @{
  */
-
 /* AHB peripherals */
 #define CH32_CLOCK_DMA1         (0U)
 #define CH32_CLOCK_DMA2         (1U)

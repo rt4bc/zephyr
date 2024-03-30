@@ -1,0 +1,9 @@
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+config PINCTRL_CH32
+	bool "Pin controller driver for WCH CH32 MCUs"
+	default y
+	depends on DT_HAS_WCH_CH32_PINCTRL_ENABLED
+	help
+	  Enable pin controller driver for WCH CH32 MCUs

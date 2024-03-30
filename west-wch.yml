@@ -1,0 +1,62 @@
+# The west manifest file for upstream Zephyr.
+#
+# The per-installation west configuration file, .west/config, sets the
+# path to the project containing this file in the [manifest] section's
+# "path" variable.
+#
+# You are free to create your own manifest files and put them in any
+# repository you want, to create your own custom Zephyr installations.
+# For example, you could create a manifest file in your own out of
+# tree application directory, which would pull this zephyr repository
+# in as an ordinary project.
+#
+# You can pass your manifest repositories to west init when creating a
+# new Zephyr installation. See the west documentation for more
+# information.
+
+manifest:
+  defaults:
+    remote: upstream
+
+  remotes:
+    - name: upstream
+      url-base: https://github.com/zephyrproject-rtos
+    - name: babblesim
+      url-base: https://github.com/BabbleSim
+
+  group-filter: [-babblesim, -optional]
+
+  #
+  # Please add items below based on alphabetical order
+  projects:
+    - name: cmsis
+      revision: 4b96cbb174678dcd3ca86e11e1f24bc5f8726da0
+      path: modules/hal/cmsis
+      groups:
+        - hal          
+    - name: hal_gigadevice
+      revision: 2994b7dde8b0b0fa9b9c0ccb13474b6a486cddc3
+      path: modules/hal/gigadevice
+      groups:
+        - hal
+    - name: hal_rpi_pico
+      path: modules/hal/rpi_pico
+      revision: fba7162cc7bee06d0149622bbcaac4e41062d368
+      groups:
+        - hal
+    - name: hal_stm32
+      revision: 60c9634f61c697e1c310ec648d33529712806069
+      path: modules/hal/stm32
+      groups:
+        - hal
+    - name: hal_wch
+      path: modules/hal/wch
+      revision: 986a156d10f43dce30be182745cac28f82a937cf
+      groups:
+        - hal
+    
+  self:
+    path: zephyr
+    west-commands: scripts/west-commands.yml
+    import: submanifests
+    
