@@ -1,0 +1,13 @@
+# Copyright (c)
+# SPDX-License-Identifier: Apache-2.0
+
+config UART_CH32
+	bool "CH32 serial driver"
+	default y
+	depends on DT_HAS_WCH_CH32_UART_ENABLED
+	select SERIAL_HAS_DRIVER
+	select SERIAL_SUPPORT_INTERRUPT
+	select USE_CH32_UART
+	select RESET
+	help
+	  This option enables the USART driver for CH32 SoC family.

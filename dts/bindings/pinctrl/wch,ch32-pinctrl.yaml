@@ -19,7 +19,7 @@ properties:
 
 child-binding:
   description: |
-      This binding gives a base representation of the STM32 pins configuration
+      This binding gives a base representation of the CH32 pins configuration
 
   include:
     - name: pincfg-node.yaml
@@ -59,7 +59,7 @@ child-binding:
 
         To simplify the usage, macro is available to generate "pinmux" field.
         This macro is available here:
-          -include/zephyr/dt-bindings/pinctrl/stm32-pinctrl-common.h
+          -include/zephyr/dt-bindings/pinctrl/ch32-pinctrl-common.h
         Some examples of macro usage:
            GPIO A9 set as alternate function 2
         ... {

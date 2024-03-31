@@ -6,13 +6,19 @@
  /dts-v1/;
 
 #include <wch/ch32v307.dtsi>
-#include "ch32v307v_evt-pinctrl.dtsi"
-
+#include <ch32v30x-vc-pinctrl.dtsi>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 
  / {
 	model = "WCH CH32V307V-EVT";
 	compatible = "wch,ch32v307v-evt";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,console = &uart1;
+		zephyr,shell-uart = &uart1;
+		zephyr,flash = &flash0;
+	};
 
 	leds {
 		compatible = "gpio-leds";
@@ -38,11 +44,6 @@
 		};
 	};
 
-	chosen {
-		zephyr,sram = &sram0;
-		zephyr,flash = &flash0;
-	};
-
 	aliases {
 		led0 = &led0;
 		led1 = &led1;
@@ -59,10 +60,17 @@
 	status = "okay";
 };
 
-
 &rcc {
 	clock-frequency = <DT_FREQ_M(144)>;
 	apb1-prescaler = <2>;
 	apb2-prescaler = <2>;
 	clocks = <&pll1>;
+};
+
+
+&uart1 {
+	pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
 };

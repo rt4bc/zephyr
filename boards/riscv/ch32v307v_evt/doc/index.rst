@@ -61,7 +61,7 @@ The board configuration supports the following hardware features:
      - :dtcompatible:`wch,ch32-pwm`
    * - USART
      - :kconfig:option:`CONFIG_SERIAL`
-     - :dtcompatible:`wch,ch32-usart`
+     - :dtcompatible:`wch,ch32-uart`
    * - ADC
      - :kconfig:option:`CONFIG_ADC`
      - :dtcompatible:`wch,ch32-adc`

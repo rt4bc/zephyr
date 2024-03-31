@@ -10,4 +10,7 @@ config HAS_CH32_HAL
 
 if HAS_CH32_HAL
 
+config USE_CH32_UART
+	bool
+
 endif # HAS_CH32_HAL

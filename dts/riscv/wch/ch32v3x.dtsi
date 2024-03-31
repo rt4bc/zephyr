@@ -12,6 +12,7 @@
  #include <zephyr/dt-bindings/pwm/pwm.h>
 
  #include <zephyr/dt-bindings/clock/ch32_clock.h>
+ #include <zephyr/dt-bindings/reset/ch32_reset.h>
 
  / {
 	#address-cells = <1>;
@@ -141,7 +142,7 @@
 
 			rctl: reset-controller {
 				compatible = "wch,ch32-rctl";
-				#reset-cells = <2>;
+				#reset-cells = <1>;
 				status = "okay";
 			};
 		};
@@ -169,15 +170,22 @@
 				clocks = <&rcc CH32_CLOCK_BUS_APB2 CH32_CLOCK_GPIOB>;
 			};
 		};
-		
+
+		uart1: serial@40013800 {
+			compatible = "wch,ch32-uart";
+			reg = <0x40013800 0x400>;
+			interrupts = <53 0>;
+			clocks = <&rcc CH32_CLOCK_BUS_APB2 CH32_CLOCK_USART1>;
+			resets = <&rctl CH32_RESET(APB2, CH32_CLOCK_USART1)>;
+			status = "okay";
+		};
+
 		afio: afio@40010000 {
 			compatible = "wch,ch32-afio";
 			reg = <0x40010000 0x400>;
 			clocks = <&rcc 0x18 0>;
 			status = "okay";
 		};
-
-		
     };
 
 };
