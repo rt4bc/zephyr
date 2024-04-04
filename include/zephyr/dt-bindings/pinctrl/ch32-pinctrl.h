@@ -4,134 +4,124 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef CH32_PINCTRL_COMMON_H_
-#define CH32_PINCTRL_COMMON_H_
-
-#define gpio0 gpioa
-#define gpio1 gpiob
-#define gpio2 gpioc
-#define gpio3 gpiod
-#define gpio4 gpioe
+#ifndef CH32_PINCTRL_H_
+#define CH32_PINCTRL_H_
 
 /**
  * @brief numerical IDs for IO ports
  */
+
 #define	CH32_PORTA 0	/* IO port A */
 #define	CH32_PORTB 1	/* .. */
 #define	CH32_PORTC 2
 #define	CH32_PORTD 3
-#define	CH32_PORTE 4
-
-#ifndef CH32_PORTS_MAX
-#define CH32_PORTS_MAX (CH32_PORTE + 1)
-#endif
+#define	CH32_PORTE 4	/* IO port E */
 
 /**
  * @brief helper macro to encode an IO port pin in a numerical format
  */
 #define CH32PIN(_port, _pin) \
 	(_port << 4 | _pin)
-/**
- * @brief Pin modes
- */
-
-#define CH32_AF0     0x0
-#define CH32_AF1     0x1
-#define CH32_AF2     0x2
-#define CH32_AF3     0x3
-#define CH32_AF4     0x4
-#define CH32_AF5     0x5
-#define CH32_AF6     0x6
-#define CH32_AF7     0x7
-#define CH32_AF8     0x8
-#define CH32_AF9     0x9
-#define CH32_AF10    0xa
-#define CH32_AF11    0xb
-#define CH32_AF12    0xc
-#define CH32_AF13    0xd
-#define CH32_AF14    0xe
-#define CH32_AF15    0xf
-#define CH32_ANALOG  0x10
-#define CH32_GPIO    0x11
 
 /**
  * @brief Macro to generate pinmux int using port, pin number and mode arguments
- * This is inspired from Linux equivalent st,stm32f429-pinctrl binding
  */
 
-#define CH32_MODE_SHIFT 0U
-#define CH32_MODE_MASK  0x1FU
-#define CH32_LINE_SHIFT 5U
-#define CH32_LINE_MASK  0xFU
-#define CH32_PORT_SHIFT 9U
-#define CH32_PORT_MASK  0xFU
+#define CH32_MODE_SHIFT  0U
+#define CH32_MODE_MASK   0xFU
+#define CH32_LINE_SHIFT  4U
+#define CH32_LINE_MASK   0xFU
+#define CH32_PORT_SHIFT  8U
+#define CH32_PORT_MASK   0x7U
+#define CH32_REMAP_SHIFT 11U
+#define CH32_REMAP_MASK  0x3FFU
 
 /**
  * @brief Pin configuration configuration bit field.
  *
  * Fields:
  *
- * - mode [ 0 : 4 ]
- * - line [ 5 : 8 ]
- * - port [ 9 : 12 ]
+ * - mode  [ 0 : 3 ]
+ * - line  [ 4 : 7 ]
+ * - port  [ 8 : 11 ]
+ * - remap [ 12 : 19 ]
  *
  * @param port Port ('A'..'E')
  * @param line Pin (0..15)
- * @param mode Mode (ANALOG, GPIO_IN, ALTERNATE).
+ * @param mode Pin mode (ANALOG, GPIO_IN, ALTERNATE).
+ * @param remap Pin remapping configuration (NO_REMAP, REMAP_1, ...)
  */
-#define CH32_PINMUX(port, line, mode)					       \
+#define CH32_PINMUX(port, line, mode, remap)				       \
 		(((((port) - 'A') & CH32_PORT_MASK) << CH32_PORT_SHIFT) |    \
 		(((line) & CH32_LINE_MASK) << CH32_LINE_SHIFT) |	       \
-		(((CH32_ ## mode) & CH32_MODE_MASK) << CH32_MODE_SHIFT))
+		(((mode) & CH32_MODE_MASK) << CH32_MODE_SHIFT) |	       \
+		(((remap) & CH32_REMAP_MASK) << CH32_REMAP_SHIFT))
 
+/**
+ * @brief Pin modes
+ */
+
+#define ALTERNATE	0x0  /* Alternate function output */
+#define GPIO_IN		0x1  /* Input */
+#define ANALOG		0x2  /* Analog */
+#define GPIO_OUT	0x3  /* Output */
 
 /**
  * @brief PIN configuration bitfield
  *
  * Pin configuration is coded with the following
  * fields
- *    Alternate Functions [ 0 : 3 ]
- *    GPIO Mode           [ 4 : 5 ]
- *    GPIO Output type    [ 6 ]
- *    GPIO Speed          [ 7 : 8 ]
- *    GPIO PUPD config    [ 9 : 10 ]
- *    GPIO Output data     [ 11 ]
+ *    GPIO I/O Mode       [ 0 ]
+ *    GPIO Input config   [ 1 : 2 ]
+ *    GPIO Output speed   [ 3 : 4 ]
+ *    GPIO Output PP/OD   [ 5 ]
+ *    GPIO Output AF/GP   [ 6 ]
+ *    GPIO PUPD Config    [ 7 : 8 ]
+ *    GPIO ODR            [ 9 ]
  *
+ * Applicable to WCH CH32 series
  */
 
-/* GPIO Mode */
-#define CH32_MODER_INPUT_MODE		(0x0 << CH32_MODER_SHIFT)
-#define CH32_MODER_OUTPUT_MODE		(0x1 << CH32_MODER_SHIFT)
-#define CH32_MODER_ALT_MODE		(0x2 << CH32_MODER_SHIFT)
-#define CH32_MODER_ANALOG_MODE		(0x3 << CH32_MODER_SHIFT)
-#define CH32_MODER_MASK	 	0x3
-#define CH32_MODER_SHIFT		4
+/* Port Mode */
+#define CH32_MODE_INPUT		(0x0 << CH32_MODE_INOUT_SHIFT)
+#define CH32_MODE_OUTPUT		(0x1 << CH32_MODE_INOUT_SHIFT)
+#define CH32_MODE_INOUT_MASK		0x1
+#define CH32_MODE_INOUT_SHIFT		0
 
-/* GPIO Output type */
-#define CH32_OTYPER_PUSH_PULL		(0x0 << CH32_OTYPER_SHIFT)
-#define CH32_OTYPER_OPEN_DRAIN		(0x1 << CH32_OTYPER_SHIFT)
-#define CH32_OTYPER_MASK		0x1
-#define CH32_OTYPER_SHIFT		6
+/* Input Port configuration */
+#define CH32_CNF_IN_ANALOG		(0x0 << CH32_CNF_IN_SHIFT)
+#define CH32_CNF_IN_FLOAT		(0x1 << CH32_CNF_IN_SHIFT)
+#define CH32_CNF_IN_PUPD		(0x2 << CH32_CNF_IN_SHIFT)
+#define CH32_CNF_IN_MASK		0x3
+#define CH32_CNF_IN_SHIFT		1
 
-/* GPIO speed */
-#define CH32_OSPEEDR_LOW_SPEED		(0x0 << CH32_OSPEEDR_SHIFT)
-#define CH32_OSPEEDR_MEDIUM_SPEED	(0x1 << CH32_OSPEEDR_SHIFT)
-#define CH32_OSPEEDR_HIGH_SPEED	(0x2 << CH32_OSPEEDR_SHIFT)
-#define CH32_OSPEEDR_VERY_HIGH_SPEED	(0x3 << CH32_OSPEEDR_SHIFT)
-#define CH32_OSPEEDR_MASK		0x3
-#define CH32_OSPEEDR_SHIFT		7
+/* Output Port configuration */
+#define CH32_MODE_OUTPUT_MAX_10	(0x0 << CH32_MODE_OSPEED_SHIFT)
+#define CH32_MODE_OUTPUT_MAX_2		(0x1 << CH32_MODE_OSPEED_SHIFT)
+#define CH32_MODE_OUTPUT_MAX_50	(0x2 << CH32_MODE_OSPEED_SHIFT)
+#define CH32_MODE_OSPEED_MASK		0x3
+#define CH32_MODE_OSPEED_SHIFT		3
 
-/* GPIO High impedance/Pull-up/pull-down */
-#define CH32_PUPDR_NO_PULL		(0x0 << CH32_PUPDR_SHIFT)
-#define CH32_PUPDR_PULL_UP		(0x1 << CH32_PUPDR_SHIFT)
-#define CH32_PUPDR_PULL_DOWN		(0x2 << CH32_PUPDR_SHIFT)
-#define CH32_PUPDR_MASK		0x3
-#define CH32_PUPDR_SHIFT		9
+#define CH32_CNF_PUSH_PULL		(0x0 << CH32_CNF_OUT_0_SHIFT)
+#define CH32_CNF_OPEN_DRAIN		(0x1 << CH32_CNF_OUT_0_SHIFT)
+#define CH32_CNF_OUT_0_MASK		0x1
+#define CH32_CNF_OUT_0_SHIFT		5
+
+#define CH32_CNF_GP_OUTPUT		(0x0 << CH32_CNF_OUT_1_SHIFT)
+#define CH32_CNF_ALT_FUNC		(0x1 << CH32_CNF_OUT_1_SHIFT)
+#define CH32_CNF_OUT_1_MASK		0x1
+#define CH32_CNF_OUT_1_SHIFT		6
+
+/* GPIO High impedance/Pull-up/Pull-down */
+#define CH32_PUPD_NO_PULL		(0x0 << CH32_PUPD_SHIFT)
+#define CH32_PUPD_PULL_UP		(0x1 << CH32_PUPD_SHIFT)
+#define CH32_PUPD_PULL_DOWN		(0x2 << CH32_PUPD_SHIFT)
+#define CH32_PUPD_MASK			0x3
+#define CH32_PUPD_SHIFT		7
 
 /* GPIO plain output value */
 #define CH32_ODR_0			(0x0 << CH32_ODR_SHIFT)
 #define CH32_ODR_1			(0x1 << CH32_ODR_SHIFT)
 #define CH32_ODR_MASK			0x1
-#define CH32_ODR_SHIFT			11
-
-#endif /*CH32_PINCTRL_COMMON_H_*/
+#define CH32_ODR_SHIFT			9
+#endif /*CH32_PINCTRL_H_*/

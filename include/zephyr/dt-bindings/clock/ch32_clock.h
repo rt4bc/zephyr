@@ -11,81 +11,87 @@
  * @name Register offsets
  * @{
  */
-#define CH32_CLOCK_BUS_AHB     0x40021014U
-#define CH32_CLOCK_BUS_APB2    0x40021018U
-#define CH32_CLOCK_BUS_APB1    0x4002101CU
+#define CH32_RCC_BASE               0x40021000U
+#define CH32_RCC_AHBEN_OFFSET       0x14U
+#define CH32_RCC_APB2EN_OFFSET      0x18U
+#define CH32_RCC_APB1EN_OFFSET      0x1CU
 
-#define CH32_CLOCK_BUS_APB2_RST     0x4002100CU
-#define CH32_CLOCK_BUS_APB1_RST     0x40021010U
-#define CH32_CLOCK_BUS_APB2_EN      0x40021018U
-#define CH32_CLOCK_BUS_APB1_EN      0x4002101CU
-
-#define CH32_PERIPH_BUS_MIN    CH32_CLOCK_BUS_AHB
-#define CH32_PERIPH_BUS_MAX    CH32_CLOCK_BUS_APB1
+#define CH32_PERIPH_BUS_MIN         CH32_RCC_BASE
+#define CH32_PERIPH_BUS_MAX         (CH32_RCC_BASE + CH32_RCC_APB1EN_OFFSET)
+/**
+ * Encode RCC register offset and configuration bit.
+ *
+ * - 0..5: bit number
+ * - 6..14: offset
+ * - 15: reserved
+ *
+ * @param reg RCC register name (expands to CH32_{reg}_OFFSET)
+ * @param bit Configuration bit
+ */
+#define CH32_CLOCK_CONFIG(reg, bit) \
+	(((CH32_RCC_ ## reg ## _OFFSET) << 6U) | (bit))
 
 /**
  * @name Clock enable/disable definitions for peripherals
  * @{
  */
 /* AHB peripherals */
-#define CH32_CLOCK_DMA1         (0U)
-#define CH32_CLOCK_DMA2         (1U)
-#define CH32_CLOCK_SRAM         (2U)
-#define CH32_CLOCK_CRC          (6U)
-#define CH32_CLOCK_FSMC         (8U)
-#define CH32_CLOCK_RNG          (9U)
-#define CH32_CLOCK_SDIO         (10U)
-#define CH32_CLOCK_USBHS        (11U)
-#define CH32_CLOCK_USBFS        (12U)
-#define CH32_CLOCK_DVP          (13U)
-#define CH32_CLOCK_ETHMAC       (14U)
-#define CH32_CLOCK_ETHMACTX     (15U)
-#define CH32_CLOCK_ETHMACRX     (16U)
-#define CH32_CLOCK_BLEC         (16U)
-#define CH32_CLOCK_BLES         (17U)
+#define CH32_CLOCK_DMA1         CH32_CLOCK_CONFIG(AHBEN, 0)
+#define CH32_CLOCK_DMA2         CH32_CLOCK_CONFIG(AHBEN, 1)
+#define CH32_CLOCK_SRAM         CH32_CLOCK_CONFIG(AHBEN, 2)
+#define CH32_CLOCK_CRC          CH32_CLOCK_CONFIG(AHBEN, 6)
+#define CH32_CLOCK_FSMC         CH32_CLOCK_CONFIG(AHBEN, 8)
+#define CH32_CLOCK_RNG          CH32_CLOCK_CONFIG(AHBEN, 9)
+#define CH32_CLOCK_SDIO         CH32_CLOCK_CONFIG(AHBEN, 10)
+#define CH32_CLOCK_USBHS        CH32_CLOCK_CONFIG(AHBEN, 11)
+#define CH32_CLOCK_USBFS        CH32_CLOCK_CONFIG(AHBEN, 12)
+#define CH32_CLOCK_DVP          CH32_CLOCK_CONFIG(AHBEN, 13)
+#define CH32_CLOCK_ETHMAC       CH32_CLOCK_CONFIG(AHBEN, 14)
+#define CH32_CLOCK_ETHMACTX     CH32_CLOCK_CONFIG(AHBEN, 15)
+#define CH32_CLOCK_ETHMACRX     CH32_CLOCK_CONFIG(AHBEN, 16)
+#define CH32_CLOCK_BLES         CH32_CLOCK_CONFIG(AHBEN, 17)
 
 /* APB1 peripherals */
-#define CH32_CLOCK_TIM2         (0U)
-#define CH32_CLOCK_TIM3         (1U)
-#define CH32_CLOCK_TIM4         (2U)
-#define CH32_CLOCK_TIM5         (3U)
-#define CH32_CLOCK_TIM6         (4U)
-#define CH32_CLOCK_TIM7         (5U)
-#define CH32_CLOCK_USART6       (6U)
-#define CH32_CLOCK_USART7       (7U)
-#define CH32_CLOCK_USART8       (8U)
-#define CH32_CLOCK_WWDG         (11U)
-#define CH32_CLOCK_SPI2         (14U)
-#define CH32_CLOCK_SPI3         (15U)
-#define CH32_CLOCK_USART2       (17U)
-#define CH32_CLOCK_USART3       (18U)
-#define CH32_CLOCK_USART4       (19U)
-#define CH32_CLOCK_USART5       (20U)
-#define CH32_CLOCK_I2C1         (21U)
-#define CH32_CLOCK_I2C2         (22U)
-#define CH32_CLOCK_USBD         (23U)
-#define CH32_CLOCK_CAN1         (25U)
-#define CH32_CLOCK_CAN2         (26U)
-#define CH32_CLOCK_BKP          (27U)
-#define CH32_CLOCK_PWR          (28U)
-#define CH32_CLOCK_DAC          (29U)
+#define CH32_CLOCK_TIM2         CH32_CLOCK_CONFIG(APB1EN, 0)
+#define CH32_CLOCK_TIM3         CH32_CLOCK_CONFIG(APB1EN, 1)
+#define CH32_CLOCK_TIM4         CH32_CLOCK_CONFIG(APB1EN, 2)
+#define CH32_CLOCK_TIM5         CH32_CLOCK_CONFIG(APB1EN, 3)
+#define CH32_CLOCK_TIM6         CH32_CLOCK_CONFIG(APB1EN, 4)
+#define CH32_CLOCK_TIM7         CH32_CLOCK_CONFIG(APB1EN, 5)
+#define CH32_CLOCK_USART6       CH32_CLOCK_CONFIG(APB1EN, 6)
+#define CH32_CLOCK_USART7       CH32_CLOCK_CONFIG(APB1EN, 7)
+#define CH32_CLOCK_USART8       CH32_CLOCK_CONFIG(APB1EN, 8)
+#define CH32_CLOCK_WWDG         CH32_CLOCK_CONFIG(APB1EN, 11)
+#define CH32_CLOCK_SPI2         CH32_CLOCK_CONFIG(APB1EN, 14)
+#define CH32_CLOCK_SPI3         CH32_CLOCK_CONFIG(APB1EN, 15)
+#define CH32_CLOCK_USART2       CH32_CLOCK_CONFIG(APB1EN, 17)
+#define CH32_CLOCK_USART3       CH32_CLOCK_CONFIG(APB1EN, 18)
+#define CH32_CLOCK_USART4       CH32_CLOCK_CONFIG(APB1EN, 19)
+#define CH32_CLOCK_USART5       CH32_CLOCK_CONFIG(APB1EN, 20)
+#define CH32_CLOCK_I2C1         CH32_CLOCK_CONFIG(APB1EN, 21)
+#define CH32_CLOCK_I2C2         CH32_CLOCK_CONFIG(APB1EN, 22)
+#define CH32_CLOCK_USBD         CH32_CLOCK_CONFIG(APB1EN, 23)
+#define CH32_CLOCK_CAN1         CH32_CLOCK_CONFIG(APB1EN, 25)
+#define CH32_CLOCK_CAN2         CH32_CLOCK_CONFIG(APB1EN, 26)
+#define CH32_CLOCK_BKP          CH32_CLOCK_CONFIG(APB1EN, 27)
+#define CH32_CLOCK_PWR          CH32_CLOCK_CONFIG(APB1EN, 28)
+#define CH32_CLOCK_DAC          CH32_CLOCK_CONFIG(APB1EN, 29)
 
 
 /* APB2 peripherals */
-#define CH32_CLOCK_AFIO         (0U)
-#define CH32_CLOCK_GPIOA        (2U)
-#define CH32_CLOCK_GPIOB        (3U)
-#define CH32_CLOCK_GPIOC        (4U)
-#define CH32_CLOCK_GPIOD        (5U)
-#define CH32_CLOCK_GPIOE        (6U)
-#define CH32_CLOCK_ADC1         (9U)
-#define CH32_CLOCK_ADC2         (10U)
-#define CH32_CLOCK_TIM1         (11U)
-#define CH32_CLOCK_SPI1         (12U)
-#define CH32_CLOCK_TIM8         (13U)
-#define CH32_CLOCK_USART1       (14U)
-#define CH32_CLOCK_USART2       (15U)
-#define CH32_CLOCK_TIM9         (19U)
-#define CH32_CLOCK_TIM10        (20U)
+#define CH32_CLOCK_AFIO         CH32_CLOCK_CONFIG(APB2EN, 0)
+#define CH32_CLOCK_GPIOA        CH32_CLOCK_CONFIG(APB2EN, 2)
+#define CH32_CLOCK_GPIOB        CH32_CLOCK_CONFIG(APB2EN, 3)
+#define CH32_CLOCK_GPIOC        CH32_CLOCK_CONFIG(APB2EN, 4)
+#define CH32_CLOCK_GPIOD        CH32_CLOCK_CONFIG(APB2EN, 5)
+#define CH32_CLOCK_GPIOE        CH32_CLOCK_CONFIG(APB2EN, 6)
+#define CH32_CLOCK_ADC1         CH32_CLOCK_CONFIG(APB2EN, 9)
+#define CH32_CLOCK_ADC2         CH32_CLOCK_CONFIG(APB2EN, 10)
+#define CH32_CLOCK_TIM1         CH32_CLOCK_CONFIG(APB2EN, 11)
+#define CH32_CLOCK_SPI1         CH32_CLOCK_CONFIG(APB2EN, 12)
+#define CH32_CLOCK_TIM8         CH32_CLOCK_CONFIG(APB2EN, 13)
+#define CH32_CLOCK_USART1       CH32_CLOCK_CONFIG(APB2EN, 14)
+#define CH32_CLOCK_TIM9         CH32_CLOCK_CONFIG(APB2EN, 19)
+#define CH32_CLOCK_TIM10        CH32_CLOCK_CONFIG(APB2EN, 20)
 
 #endif /* ZEPHYR_INCLUDE_DT_BINDINGS_CLOCK_CH32_CLOCKS_H_ */

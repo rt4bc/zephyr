@@ -11,11 +11,14 @@
 #include <zephyr/drivers/clock_control.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/gpio/gpio_utils.h>
+#include <zephyr/drivers/reset.h>
 
 #include <zephyr/dt-bindings/pinctrl/ch32-pinctrl.h>
+#include <zephyr/dt-bindings/clock/ch32_clock.h>
 #include <zephyr/drivers/clock_control/ch32_clock_control.h>
 
 #include <ch32v30x_gpio.h>
+
 /**
  * @brief configuration of GPIO device
  */
@@ -27,7 +30,8 @@ struct gpio_ch32_config {
 	/* IO port */
 	int port;
 	struct ch32_pclken pclken;
-};
+	struct reset_dt_spec reset;
+};	
 
 /**
  * @brief driver data
@@ -149,6 +153,9 @@ static int gpio_ch32_init(const struct device *port)
 	const struct gpio_ch32_config *config = port->config;
 
 	(void)clock_control_on(CH32_CLOCK_CONTROLLER, (clock_control_subsys_t)&config->pclken);
+
+	(void)reset_line_toggle_dt(&config->reset);
+
 	return 0;
 }
 
@@ -162,9 +169,10 @@ static int gpio_ch32_init(const struct device *port)
 		.port = n,                                                                         \
 		.pclken =                                                                          \
 			{                                                                          \
-				.bus = DT_CLOCKS_CELL(DT_NODELABEL(gpio##n), bus),                 \
-				.enr = DT_CLOCKS_CELL(DT_NODELABEL(gpio##n), bits),                \
+				.bus = (DT_INST_CLOCKS_CELL(n, id) >> 6U) + CH32_RCC_BASE,                 \
+				.enr = DT_INST_CLOCKS_CELL(n, id) & 0x3FU,                \
 			},                                                                         \
+		.reset = RESET_DT_SPEC_INST_GET(n),									\
 	};                                                                                         \
                                                                                                    \
 	static struct gpio_ch32_data gpio_ch32_data##n;                                            \

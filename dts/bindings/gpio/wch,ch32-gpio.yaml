@@ -5,13 +5,16 @@ description: CH32 GPIO node
 
 compatible: "wch,ch32-gpio"
 
-include: [gpio-controller.yaml, base.yaml]
+include: [gpio-controller.yaml, reset-device.yaml, base.yaml]
 
 properties:
   reg:
     required: true
 
   clocks:
+    required: true
+  
+  resets:
     required: true
 
   "#gpio-cells":

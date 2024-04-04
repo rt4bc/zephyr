@@ -14,7 +14,7 @@
 #define LSE_FREQ  DT_PROP(DT_PATH(clocks, clk_lse), clock_frequency)
 #define PLL1_MULT DT_PROP(DT_PATH(clocks, pll1), clock_mult)
 
-#define RCC_AHB_PRESCALER  DT_PROP(DT_PATH(soc, reset_clock_controller_40021000), ahb_prescaler)
+#define RCC_AHB_PRESCALER  DT_PROP(DT_PATH(soc, rcc_40021000), ahb_prescaler)
 #define RCC_APB1_PRESCALER DT_PROP(DT_NODELABEL(rcc), apb1_prescaler)
 #define RCC_APB2_PRESCALER DT_PROP(DT_NODELABEL(rcc), apb2_prescaler)
 

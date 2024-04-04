@@ -120,15 +120,15 @@ static int clock_control_ch32_get_rate(const struct device *dev, clock_control_s
 	uint32_t apb2_clock = ahb_clock / RCC_APB2_PRESCALER;
 	switch (pclken->bus)
 	{
-	case CH32_CLOCK_BUS_AHB:
+	case (CH32_RCC_BASE + CH32_RCC_AHBEN_OFFSET):
 		*rate = ahb_clock;
 		break;
 		
-		case CH32_CLOCK_BUS_APB1:
+		case (CH32_RCC_BASE + CH32_RCC_APB1EN_OFFSET):
 		*rate = apb1_clock;
 		break;
 
-		case CH32_CLOCK_BUS_APB2:
+		case (CH32_RCC_BASE + CH32_RCC_APB2EN_OFFSET):
 		*rate = apb2_clock;
 		break;
 	
