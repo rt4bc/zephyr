@@ -2,3 +2,16 @@
  * Copyright (c) 2021, TODO
  * SPDX-License-Identifier: Apache-2.0
  */
+
+#include <dt-bindings/pinctrl/ch32v30x-vc-pinctrl.h>
+
+&pinctrl {
+
+    usart1_default: usart1_default {
+		group1{
+			pinmux = <USART1_RX_PA10>, <USART1_TX_PA9>;
+			slew-rate = "max-speed-10mhz";
+		};
+	};
+
+};

@@ -13,9 +13,15 @@
 #include <zephyr/drivers/uart.h>
 #include <zephyr/irq.h>
 
+#include <zephyr/dt-bindings/clock/ch32_clock.h>
 #include <zephyr/drivers/clock_control/ch32_clock_control.h>
+
 #include <ch32v30x_usart.h>
 
+#define CH32_UART_DEFAULT_BAUDRATE 115200
+#define CH32_UART_DEFAULT_PARITY UART_CFG_PARITY_NONE
+#define CH32_UART_DEFAULT_STOP_BITS UART_CFG_STOP_BITS_1
+#define CH32_UART_DEFAULT_DATA_BITS UART_CFG_DATA_BITS_8
 
 struct uart_ch32_config {
 	/* USART instance */
@@ -24,16 +30,15 @@ struct uart_ch32_config {
 	const struct reset_dt_spec reset;
 	/* clock subsystem driving this peripheral */
 	const struct ch32_pclken pclken;
+	const struct pinctrl_dev_config *pcfg;
+	/* uart config */
+	struct uart_config *uart_cfg;
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	uart_irq_config_func_t irq_config_func;
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 };
 
 struct uart_ch32_data {
-	/* clock device */
-	const struct device *clock;
-	/* uart config */
-	struct uart_config *uart_cfg;
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	uart_irq_callback_user_data_t user_cb;
 	void *user_data;
@@ -48,11 +53,82 @@ static void uart_ch32_isr(const struct device *dev)
 
 static int uart_ch32_init(const struct device *dev)
 {
-	const struct ch32_uart_config *const cfg = dev->config;
-	struct ch32_uart_data *const data = dev->data;
-	uint32_t word_length;
-	uint32_t parity;
+	const struct uart_ch32_config *const cfg = dev->config;
 	int ret;
+	USART_InitTypeDef USART_InitStructure;
+
+	ret = pinctrl_apply_state(cfg->pcfg, PINCTRL_STATE_DEFAULT);
+
+	(void)clock_control_on(DEVICE_DT_GET(DT_NODELABEL(rcc)), 
+				(clock_control_subsys_t)&cfg->pclken);
+	(void)reset_line_toggle_dt(&cfg->reset);
+	
+	switch (cfg->uart_cfg->parity)
+	{
+	case UART_CFG_PARITY_NONE:
+		USART_InitStructure.USART_Parity = USART_Parity_No;
+		break;
+	case UART_CFG_PARITY_ODD:
+		USART_InitStructure.USART_Parity = USART_Parity_Odd;
+		break;
+	case UART_CFG_PARITY_EVEN:
+		USART_InitStructure.USART_Parity = USART_Parity_Even;
+		break;
+	default:
+		USART_InitStructure.USART_Parity = USART_Parity_No;
+		break;
+	}
+
+	switch (cfg->uart_cfg->stop_bits)
+	{
+	case UART_CFG_STOP_BITS_0_5:
+		USART_InitStructure.USART_StopBits = USART_StopBits_0_5;
+		break;
+	case UART_CFG_STOP_BITS_1:
+		USART_InitStructure.USART_StopBits = USART_StopBits_1;
+		break;
+	case UART_CFG_STOP_BITS_1_5:
+		USART_InitStructure.USART_StopBits = USART_StopBits_1_5;
+		break;
+	case UART_CFG_STOP_BITS_2:
+		USART_InitStructure.USART_StopBits = USART_StopBits_2;
+		break;
+	default:
+		USART_InitStructure.USART_StopBits = USART_StopBits_1;
+		break;
+	}
+
+	switch (cfg->uart_cfg->data_bits)
+	{
+	case UART_CFG_DATA_BITS_8:
+		USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+		break;
+	case UART_CFG_DATA_BITS_9:
+		USART_InitStructure.USART_WordLength = USART_WordLength_9b;
+		break;
+	default:
+		USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+		break;
+	}
+
+	switch (cfg->uart_cfg->flow_ctrl)
+	{
+	case UART_CFG_FLOW_CTRL_NONE:
+		USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+		break;
+	case UART_CFG_FLOW_CTRL_RTS_CTS:
+		USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_RTS_CTS;
+		break;
+	default:
+		USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+		break;
+	}
+
+	USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
+	USART_InitStructure.USART_BaudRate = cfg->uart_cfg->baudrate;
+
+	USART_Init((USART_TypeDef *)cfg->uart, &USART_InitStructure);
+    USART_Cmd((USART_TypeDef *)cfg->uart, ENABLE);
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	cfg->irq_config_func(dev);
@@ -63,11 +139,26 @@ static int uart_ch32_init(const struct device *dev)
 
 static int uart_ch32_poll_in(const struct device *dev, unsigned char *c)
 {
+	const struct uart_ch32_config *const cfg = dev->config;
+	uint32_t status;
+
+	status = USART_GetFlagStatus((USART_TypeDef *)cfg->uart, USART_FLAG_RXNE);
+	if (!status) {
+		return -EPERM;
+	}
+	*c = (unsigned char)(USART_ReceiveData((USART_TypeDef *)cfg->uart));
 	return 0;
 }
 
 static void uart_ch32_poll_out(const struct device *dev, unsigned char c)
 {
+	const struct uart_ch32_config *const cfg = dev->config;
+	
+	USART_SendData((USART_TypeDef *)cfg->uart, (uint16_t)(c));
+	do
+	{
+	} while(!USART_GetFlagStatus((USART_TypeDef *)cfg->uart, USART_FLAG_TXE));
+	
 }
 
 static int uart_ch32_err_check(const struct device *dev)
@@ -212,17 +303,41 @@ static const struct uart_driver_api uart_ch32_driver_api = {
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 
 #else /* CONFIG_UART_INTERRUPT_DRIVEN */
-#define UART_CH32_IRQ_HANDLER_DECL(n) /* Not used */
-#define UART_CH32_IRQ_HANDLER(n) /* Not used */
+#define UART_CH32_IRQ_HANDLER_DECL(idx) /* Not used */
+#define UART_CH32_IRQ_HANDLER(idx) /* Not used */
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 
-#define UART_CH32_INIT(n) \
-	static struct uart_ch32_data uart_ch32_data##n; \
-	static const struct uart_ch32_config uart_ch32_config##n; \
-	DEVICE_DT_INST_DEFINE(n, &uart_ch32_init, \
+#define UART_CH32_INIT(idx) \
+	PINCTRL_DT_INST_DEFINE(idx);					\
+	static struct uart_ch32_data uart_ch32_data##idx; \
+	static struct uart_config uart_cfg_##idx = {			\
+	.baudrate  = DT_INST_PROP_OR(idx, current_speed,		\
+				     CH32_UART_DEFAULT_BAUDRATE),	\
+	.parity    = DT_INST_ENUM_IDX_OR(idx, parity,			\
+					 CH32_UART_DEFAULT_PARITY),	\
+	.stop_bits = DT_INST_ENUM_IDX_OR(idx, stop_bits,		\
+					 CH32_UART_DEFAULT_STOP_BITS),	\
+	.data_bits = DT_INST_ENUM_IDX_OR(idx, data_bits,		\
+					 CH32_UART_DEFAULT_DATA_BITS),	\
+	.flow_ctrl = DT_INST_PROP(idx, hw_flow_control)		\
+					? USART_HardwareFlowControl_RTS_CTS	\
+					: USART_HardwareFlowControl_None,	\
+	};									\
+	static const struct uart_ch32_config uart_ch32_config##idx = { \
+		.uart = (USART_TypeDef *)DT_INST_REG_ADDR(idx),				\
+		.reset = RESET_DT_SPEC_INST_GET(idx), 		\
+		.pclken =                                   \
+			{                                      	\
+				.bus = (DT_INST_CLOCKS_CELL(idx, id) >> 6U) + CH32_RCC_BASE,\
+				.enr = DT_INST_CLOCKS_CELL(idx, id) & 0x3FU,                \
+			},  										\
+		.pcfg = PINCTRL_DT_INST_DEV_CONFIG_GET(idx), \
+		.uart_cfg = &uart_cfg_##idx, \
+		};	\
+	DEVICE_DT_INST_DEFINE(idx, &uart_ch32_init, \
 			      NULL,						\
-			      &uart_ch32_data##n,				\
-			      &uart_ch32_config##n, PRE_KERNEL_1,		\
+			      &uart_ch32_data##idx,				\
+			      &uart_ch32_config##idx, PRE_KERNEL_1,		\
 			      CONFIG_SERIAL_INIT_PRIORITY,			\
 			      &uart_ch32_driver_api);
 

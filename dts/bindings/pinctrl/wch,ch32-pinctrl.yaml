@@ -2,85 +2,48 @@
 # SPDX-License-Identifier: Apache-2.0
 
 description: |
-    CH32 Pin controller Node
-    Based on pincfg-node.yaml binding.
+    The CH32 pin controller (AFIO Model) is a singleton node responsible for
+    controlling pin function selection and pin properties. For example, you can
+    use this node to route USART1 RX to pin PA10 and enable the pull-up resistor
+    on the pin. Remapping is also supported.
 
-    Note: `bias-disable` and `drive-push-pull` are default pin configurations.
-           They will be applied in case no `bias-foo` or `driver-bar` properties
-           are set.
+    The node has the 'pinctrl' node label set in your SoC's devicetree,
+    so you can modify it like this:
 
+      &pinctrl {
+              /* your modifications go here */
+      };
 compatible: "wch,ch32-pinctrl"
 
 include: base.yaml
 
-properties:
-  reg:
-    required: true
-
 child-binding:
-  description: |
-      This binding gives a base representation of the CH32 pins configuration
+  child-binding:
+    properties:
+      pinmux:
+        required: true
+        type: array
+        description: |
+          An array of pins sharing the same group properties. The pins should
+          be defined using pre-defined macros or, alternatively, using the
+          CH32_PINMUX_AF utility macros depending on the pinmux model used by 
+          the SoC series.
+      
+      remapping:
+        type: int
+        default: 0
+        description: |
+          Set Alternate function remapping confiuration, Bit0~3, AFIO_PCFR1~2 
+          registers offsets, Bit4~7, remapping configuration values, Bit15~8
+          remapping bits offset in the registers.
 
-  include:
-    - name: pincfg-node.yaml
-      property-allowlist:
-        - bias-disable
-        - bias-pull-down
-        - bias-pull-up
-        - drive-push-pull
-        - drive-open-drain
-        - output-low
-        - output-high
-
-  properties:
-    pinmux:
-      required: true
-      type: int
-      description: |
-        Reused from
-        https://github.com/torvalds/linux/blob/master/Documentation/devicetree/bindings/pinctrl/st,stm32-pinctrl.yaml
-        Integer array, represents gpio pin number and mux setting.
-        These defines are calculated as: ((port * 16 + line) << 8) | function
-        With:
-        - port: The gpio port index (PA = 0, PB = 1, ..., PK = 11)
-        - line: The line offset within the port (PA0 = 0, PA1 = 1, ..., PA15 = 15)
-        - function: The function number, can be:
-        * 0 : Alternate Function 0
-        * 1 : Alternate Function 1
-        * 2 : Alternate Function 2
-        * ...
-        * 15 : Alternate Function 15
-        * 16 : Analog
-        * 17 : GPIO
-        In case selected pin function is GPIO, pin is statically configured as
-        a plain input/output GPIO. Default configuration is input. Output value
-        can be configured by adding 'ouptut-low' or 'output-high' properties
-        to the pin configuration.
-
-        To simplify the usage, macro is available to generate "pinmux" field.
-        This macro is available here:
-          -include/zephyr/dt-bindings/pinctrl/ch32-pinctrl-common.h
-        Some examples of macro usage:
-           GPIO A9 set as alternate function 2
-        ... {
-                 pinmux = <CH32_PINMUX('A', 9, AF2)>;
-        };
-           GPIO A9 set as analog
-        ... {
-                 pinmux = <CH32_PINMUX('A', 9, ANALOG)>;
-        };
-           GPIO A9 set as GPIO output high
-        ... {
-                 pinmux = <CH32_PINMUX('A', 9, GPIO)>;
-                 output-high;
-        };
-
-    slew-rate:
-      type: string
-      default: "low-speed"
-      enum:
-        - "low-speed"           # Default value, CH32V30x 2MHz
-        - "medium-speed"        # CH32V30x 10MHz
-        - "high-speed"          # CH32V30x 50MHz
-      description: |
-        Pin speed. Default to low-speed.
+      slew-rate:
+        type: string
+        default: "max-speed-10mhz"
+        enum:
+          - "max-speed-10mhz"
+          - "max-speed-2mhz"
+          - "max-speed-50mhz"
+        description: |
+          Set the maximum speed of a pin. This setting effectively limits the
+          slew rate of the output signal. Defaults to "max-speed-10mhz".
