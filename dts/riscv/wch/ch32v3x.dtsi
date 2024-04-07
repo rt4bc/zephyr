@@ -118,7 +118,7 @@
 			#address-cells = <1>;
 			#size-cells = <1>;
 
-			flash0: flash@8000000 {
+			flash0: flash@0 {
 				compatible = "wch,ch32-nv-flash", "soc-nv-flash";
 				write-block-size = <256>;
 				page-size = <256>;

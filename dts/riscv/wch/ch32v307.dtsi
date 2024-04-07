@@ -15,6 +15,6 @@
  };
  
  &flash0 {
-     reg = <0x08000000 DT_SIZE_K(192)>;
+     reg = <0x0 DT_SIZE_K(192)>;
  };
  
