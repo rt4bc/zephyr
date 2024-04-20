@@ -1,0 +1,28 @@
+# Copyright (c) 
+# SPDX-License-Identifier: Apache-2.0
+
+config SPI_CH32
+	bool "WCH CH32 SPI driver"
+	default y
+	depends on DT_HAS_WCH_CH32_SPI_ENABLED
+	help
+	  Enables WCH CH32 SPI driver.
+
+if SPI_CH32
+
+config SPI_CH32_INTERRUPT
+	bool "CH32 MCU SPI Interrupt Support"
+	default y if SPI_ASYNC
+	default y if SPI_CH32_DMA
+	help
+	  Enable the interrupt driven mode for SPI instances
+
+config SPI_CH32_DMA
+	bool "CH32 MCU SPI DMA Support"
+	select DMA
+	select SPI_CH32_INTERRUPT
+	help
+	  Use the DMA for SPI transfer
+	  that enable dma channels in their device tree node.
+
+endif # SPI_CH32

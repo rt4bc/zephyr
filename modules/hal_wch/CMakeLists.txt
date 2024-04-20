@@ -24,4 +24,6 @@ endif()
 zephyr_library_sources_ifdef(CONFIG_DT_HAS_WCH_CH32_RCC_ENABLED ${ch32_soc_dir}/src/ch32v30x_rcc.c)
 zephyr_library_sources_ifdef(CONFIG_DT_HAS_WCH_CH32_GPIO_ENABLED ${ch32_soc_dir}/src/ch32v30x_gpio.c)
 zephyr_library_sources_ifdef(CONFIG_DT_HAS_WCH_CH32_UART_ENABLED ${ch32_soc_dir}/src/ch32v30x_usart.c)
+zephyr_library_sources_ifdef(CONFIG_DT_HAS_WCH_CH32_SPI_ENABLED ${ch32_soc_dir}/src/ch32v30x_spi.c)
+
 endif()

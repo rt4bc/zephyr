@@ -59,80 +59,78 @@ static void uart_ch32_isr(const struct device *dev)
 static int uart_ch32_init(const struct device *dev)
 {
 	const struct uart_ch32_config *const cfg = dev->config;
-	int ret;
-	USART_InitTypeDef USART_InitStructure;
+	uint32_t pclk_freq;
 
-	ret = pinctrl_apply_state(cfg->pcfg, PINCTRL_STATE_DEFAULT);
-
+	(void)pinctrl_apply_state(cfg->pcfg, PINCTRL_STATE_DEFAULT);
 	(void)clock_control_on(DEVICE_DT_GET(DT_NODELABEL(rcc)), 
 				(clock_control_subsys_t)&cfg->pclken);
 	(void)reset_line_toggle_dt(&cfg->reset);
 	
+	(void)clock_control_get_rate(DEVICE_DT_GET(DT_NODELABEL(rcc)), 
+				(clock_control_subsys_t)&cfg->pclken, &pclk_freq);
+
 	switch (cfg->uart_cfg->parity)
 	{
-	case UART_CFG_PARITY_NONE:
-		USART_InitStructure.USART_Parity = USART_Parity_No;
-		break;
 	case UART_CFG_PARITY_ODD:
-		USART_InitStructure.USART_Parity = USART_Parity_Odd;
+		cfg->uart->CTLR1 &= ~(USART_Parity_Odd);
+		cfg->uart->CTLR1 |= USART_Parity_Odd;
 		break;
 	case UART_CFG_PARITY_EVEN:
-		USART_InitStructure.USART_Parity = USART_Parity_Even;
+		cfg->uart->CTLR1 &= ~(USART_Parity_Odd);
+		cfg->uart->CTLR1 |= USART_Parity_Even;
 		break;
-	default:
-		USART_InitStructure.USART_Parity = USART_Parity_No;
+	default: /*UART_CFG_PARITY_NONE*/
+		cfg->uart->CTLR1 &= ~(USART_Parity_Odd);
+		cfg->uart->CTLR1 |= USART_Parity_No;
 		break;
 	}
 
 	switch (cfg->uart_cfg->stop_bits)
 	{
 	case UART_CFG_STOP_BITS_0_5:
-		USART_InitStructure.USART_StopBits = USART_StopBits_0_5;
-		break;
-	case UART_CFG_STOP_BITS_1:
-		USART_InitStructure.USART_StopBits = USART_StopBits_1;
+		cfg->uart->CTLR2 &= ~(USART_StopBits_1_5);
+		cfg->uart->CTLR2 |= USART_StopBits_0_5;
 		break;
 	case UART_CFG_STOP_BITS_1_5:
-		USART_InitStructure.USART_StopBits = USART_StopBits_1_5;
+		cfg->uart->CTLR2 &= ~(USART_StopBits_1_5);
+		cfg->uart->CTLR2 |= USART_StopBits_1_5;
 		break;
 	case UART_CFG_STOP_BITS_2:
-		USART_InitStructure.USART_StopBits = USART_StopBits_2;
+		cfg->uart->CTLR2 &= ~(USART_StopBits_1_5);
+		cfg->uart->CTLR2 |=USART_StopBits_2;
 		break;
-	default:
-		USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	default: /*UART_CFG_STOP_BITS_1*/
+		cfg->uart->CTLR2 &= ~(USART_StopBits_1_5);
+		cfg->uart->CTLR2 |= USART_StopBits_1;
 		break;
 	}
 
 	switch (cfg->uart_cfg->data_bits)
 	{
-	case UART_CFG_DATA_BITS_8:
-		USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-		break;
 	case UART_CFG_DATA_BITS_9:
-		USART_InitStructure.USART_WordLength = USART_WordLength_9b;
+		cfg->uart->CTLR1 &= ~(USART_WordLength_9b);
+		cfg->uart->CTLR1 |= USART_WordLength_9b;
 		break;
 	default:
-		USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+		cfg->uart->CTLR1 &= ~(USART_WordLength_9b);
+		cfg->uart->CTLR1 |= USART_WordLength_8b;
 		break;
 	}
 
 	switch (cfg->uart_cfg->flow_ctrl)
 	{
-	case UART_CFG_FLOW_CTRL_NONE:
-		USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-		break;
 	case UART_CFG_FLOW_CTRL_RTS_CTS:
-		USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_RTS_CTS;
+		cfg->uart->CTLR3 &= ~(USART_HardwareFlowControl_RTS_CTS);
+		cfg->uart->CTLR3 |= USART_HardwareFlowControl_RTS_CTS;
 		break;
 	default:
-		USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+		cfg->uart->CTLR3 &= ~(USART_HardwareFlowControl_RTS_CTS);
 		break;
 	}
 
-	USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
-	USART_InitStructure.USART_BaudRate = cfg->uart_cfg->baudrate;
-
-	USART_Init((USART_TypeDef *)cfg->uart, &USART_InitStructure);
+	cfg->uart->CTLR1 |= (USART_Mode_Tx | USART_Mode_Rx);
+	cfg->uart->BRR = pclk_freq / cfg->uart_cfg->baudrate;
+	
     USART_Cmd((USART_TypeDef *)cfg->uart, ENABLE);
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN

@@ -33,7 +33,11 @@ manifest:
       revision: 4b96cbb174678dcd3ca86e11e1f24bc5f8726da0
       path: modules/hal/cmsis
       groups:
-        - hal          
+        - hal  
+    - name: lvgl
+      revision: 2b498e6f36d6b82ae1da12c8b7742e318624ecf5
+      path: modules/lib/gui/lvgl
+              
     - name: hal_gigadevice
       revision: 2994b7dde8b0b0fa9b9c0ccb13474b6a486cddc3
       path: modules/hal/gigadevice
@@ -51,9 +55,10 @@ manifest:
         - hal
     - name: hal_wch
       path: modules/hal/wch
-      revision: 986a156d10f43dce30be182745cac28f82a937cf
+      revision: 512b4ea3ef341d2ae3045344a59604cef65818be
       groups:
         - hal
+    
     
   self:
     path: zephyr

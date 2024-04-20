@@ -14,4 +14,11 @@
 		};
 	};
 
+	spi1_default: spi1_default {
+		group1{
+			pinmux = <SPI1_SCK_PA5>, <SPI1_MOSI_PA7>;
+			slew-rate = "max-speed-50mhz";
+		};
+	};
+
 };

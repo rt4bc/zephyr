@@ -181,8 +181,20 @@
 			interrupts = <53 0>;
 			clocks = <&rcc CH32_CLOCK_USART1>;
 			resets = <&rctl CH32_RESET_USART1>;
-			status = "okay";
+			status = "disabled";
 		};
+
+		spi1: spi@40013000 {
+			compatible = "wch,ch32-spi";
+			reg = <0x40013000 0x400>;
+			interrupts = <51 0>;
+			clocks = <&rcc CH32_CLOCK_SPI1>;
+			resets = <&rctl CH32_RESET_SPI1>;
+			status = "disabled";
+			#address-cells = <1>;
+			#size-cells = <0>;
+		};
+
 		
     };
 
