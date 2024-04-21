@@ -129,11 +129,10 @@ static int spi_ch32_configure(const struct device *dev, const struct spi_config 
 	uint32_t pclk_freq;
 	SPI_TypeDef *SPIx;
 	SPI_InitTypeDef SPI_InitStructure = {0};
-
+	
 	if (spi_context_configured(&data->ctx, config)) {
 		return 0;
 	}
-
 	SPIx = ch32_cfg->spi;
 
 	if (SPI_OP_MODE_GET(config->operation) == SPI_OP_MODE_SLAVE) {
@@ -203,6 +202,8 @@ static int spi_ch32_configure(const struct device *dev, const struct spi_config 
 
 	// SPI_InitStructure.SPI_CRCPolynomial = 7;
 	SPI_Init(SPIx, &SPI_InitStructure);
+	
+	data->ctx.config = config;
 
 	return 0;
 }
@@ -245,6 +246,7 @@ static int spi_ch32_transceive_impl(const struct device *dev, const struct spi_c
 	spi_context_complete(&data->ctx, dev, ret);
 #endif
 #endif
+	spi_context_cs_control(&data->ctx, false);
 error:
 	spi_context_release(&data->ctx, ret);
 

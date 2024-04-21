@@ -173,6 +173,15 @@
 				clocks = <&rcc CH32_CLOCK_GPIOB>;
 				resets = <&rctl CH32_RESET_GPIOB>;
 			};
+
+			gpioc: gpio@40011000 {
+				compatible = "wch,ch32-gpio";
+				gpio-controller;
+				#gpio-cells = <2>;
+				reg = <0x40011000 0x400>;
+				clocks = <&rcc CH32_CLOCK_GPIOC>;
+				resets = <&rctl CH32_RESET_GPIOC>;
+			};
 		};
 
 		usart1: serial@40013800 {
